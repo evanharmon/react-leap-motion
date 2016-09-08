@@ -1,0 +1,45 @@
+{
+  "name": "react-leap-motion",
+  "version": "1.0.0",
+  "description": "React redux application for leap motion hand gesture device",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack -d",
+    "start": "webpack-dev-server -d"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evanharmon/react-leap-motion.git"
+  },
+  "author": "Evan Harmon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evanharmon/react-leap-motion/issues"
+  },
+  "homepage": "https://github.com/evanharmon/react-leap-motion#readme",
+  "dependencies": {
+    "expect": "^1.20.2",
+    "immutable": "^3.8.1",
+    "leapjs": "^0.6.4",
+    "react": "^15.3.0",
+    "react-dom": "^15.3.0",
+    "redux": "^3.5.2"
+  },
+  "devDependencies": {
+    "eslint-config-harmonsoft": "git://github.com/evanharmon/eslint-config-harmonsoft",
+    "hss-webpack": "git://github.com/evanharmon/hss-webpack.git",
+    "webpack-merge": "^0.14.1",
+    "webpack-validator": "^2.2.7"
+  },
+  "eslintConfig": {
+    "extends": [
+      "harmonsoft",
+      "harmonsoft/configs/es6-react"
+    ],
+    "rules": {
+      "react/jsx-no-bind": "off",
+      "react/jsx-indent-props": "off",
+      "react/prop-types": "off"
+    }
+  }
+}
