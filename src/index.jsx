@@ -62,7 +62,6 @@ const reducers = combineReducers({
 const store = createStore(reducers);
 
 // REACT COMPONENTS
-const nextHandId = 0;
 class HandsApp extends Component {
   constructor(props) {
     super(props);
@@ -76,6 +75,7 @@ class HandsApp extends Component {
       leap: {
         connected: false,
         streaming: false,
+        frame: null,
         handsLength: 0
       }
     };
@@ -107,12 +107,24 @@ class HandsApp extends Component {
         { this.state.leap.handsLength
           ? <h2>{this.state.leap.handsLength}</h2>
           : <h2></h2> }
+          {/* Display for Hands */}
+        { this.state.leap.handsLength > 0
+          ? this.state.leap.frame.hands.map(h => {
+            return (
+              <ul>
+                <li key={h.id}>Hand {h.id}</li>
+              </ul>
+            );
+          })
+          : <h2></h2> }
       </div>
     );
   }
   onStart() {
     leapCtrlr.on('connect', () => {
-      this.setState({ leap: { connected: true } });
+      this.setState({
+        leap: { connected: true }
+      });
       this.onDeviceStreaming();
       this.onFrame();
     });
@@ -120,7 +132,9 @@ class HandsApp extends Component {
   }
   onStop() {
     leapCtrlr.on('disconnect', () => {
-      this.setState({ leap: { connected: false } });
+      this.setState({
+        leap: { connected: false }
+      });
     });
     leapCtrlr.disconnect();
   }
@@ -140,6 +154,7 @@ class HandsApp extends Component {
         leap: {
           connected: this.state.leap.connected,
           streaming: this.state.leap.streaming,
+          frame: frame,
           handsLength: frame.hands.length
         }
       });
