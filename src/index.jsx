@@ -85,8 +85,7 @@ class Hand extends Component {
     super(props);
 
     this.state = {
-      pnts: PNTS,
-      r: 0
+      pnts: PNTS
     };
 
     this.onClickRotate = this.onClickRotate.bind(this);
@@ -95,12 +94,13 @@ class Hand extends Component {
   }
 
   componentDidMount() {
-    this.draw();
+    this.ctx = this.refs.canvas.getContext('2d');
+    this.draw(this.ctx);
   }
 
   render() {
     return (
-      <div>
+      <li>
        <div style={{ display: 'flex', alignItems: 'center'}}>
           <div style={{ maxWidth: '25%', alignSelf: 'flex-start'}}>
             <button onClick={() => {
@@ -111,14 +111,14 @@ class Hand extends Component {
          <div style={{ maxWidth: '75%', marginLeft: '50px' }}>
            <canvas
              style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'blue'}}
-             ref={(c) => this.ctx = c.getContext('2d') }
+             ref="canvas"
              width={CANVAS.X}
              height={CANVAS.Y}
            >
          </canvas>
          </div>
        </div>
-     </div>
+     </li>
     );
   }
   // CANVAS FUNCTIONS
@@ -137,7 +137,7 @@ class Hand extends Component {
     this.ctx.translate(this.state.pnts.X, this.state.pnts.Y);
     // move to center of object
     this.ctx.translate(this.state.pnts.HALF_LENGTH, this.state.pnts.HALF_WIDTH);
-    this.ctx.rotate(this.state.r);
+    this.ctx.rotate(0.1);
     // draw image up/left, half-size of object to keep center
     this.ctx.rect(-(this.state.pnts.HALF_LENGTH), -(this.state.pnts.HALF_WIDTH), this.state.pnts.LENGTH, this.state.pnts.WIDTH);
     this.ctx.stroke();
@@ -147,10 +147,7 @@ class Hand extends Component {
 
   onClickRotate() {
     this.ctx.clearRect(0, 0, CANVAS.X, CANVAS.Y);
-    this.setState({
-      r: this.state.r + 0.1
-    });
-    this.rotateRect(newR);
+    this.rotateRect();
   }
 }
 
@@ -168,6 +165,7 @@ class HandsApp extends Component {
         connected: false,
         streaming: false,
         frame: null,
+        hands: [],
         handsLength: 0
       }
     };
@@ -200,18 +198,15 @@ class HandsApp extends Component {
           ? <h2>{this.state.leap.handsLength}</h2>
           : <h2></h2> }
           {/* Display for Hands */}
-        { this.state.leap.handsLength > 0
-          ? this.state.leap.frame.hands.map(h => {
-            return (
-              <div>
-                <ul>
-                  <li key={h.id}>Hand {h.id}</li>
-                </ul>
-                <Hand key={h.id}/>
-              </div>
-            );
-          })
-          : <h2></h2> }
+          <ul>
+            { this.state.leap.handsLength > 0
+              ? this.state.leap.hands.map((h) => {
+                return (
+                  <Hand key={h.id}/>
+                );
+              })
+              : <h2></h2> }
+          </ul>
       </div>
     );
   }
@@ -250,6 +245,7 @@ class HandsApp extends Component {
           connected: this.state.leap.connected,
           streaming: this.state.leap.streaming,
           frame: frame,
+          hands: frame.hands,
           handsLength: frame.hands.length
         }
       });
