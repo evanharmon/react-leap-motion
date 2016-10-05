@@ -61,7 +61,99 @@ const reducers = combineReducers({
 });
 const store = createStore(reducers);
 
+
+// Canvas Size built off rectangle LENGTH
+const LENGTH = 130;
+const WIDTH = 10;
+const CANVAS = {
+  X: LENGTH * 2,
+  Y: LENGTH * 2
+};
+// half values allow accessing middle of object for rotate
+const PNTS = {
+  LENGTH: LENGTH,
+  HALF_LENGTH: LENGTH / 2,
+  WIDTH: WIDTH,
+  HALF_WIDTH: WIDTH / 2,
+  X: LENGTH - (LENGTH / 2),
+  Y: LENGTH - (WIDTH / 2)
+};
+
 // REACT COMPONENTS
+class Hand extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      pnts: PNTS,
+      r: 0
+    };
+
+    this.onClickRotate = this.onClickRotate.bind(this);
+    this.draw = this.draw.bind(this);
+    this.rotateRect = this.rotateRect.bind(this);
+  }
+
+  componentDidMount() {
+    this.draw();
+  }
+
+  render() {
+    return (
+      <div>
+       <div style={{ display: 'flex', alignItems: 'center'}}>
+          <div style={{ maxWidth: '25%', alignSelf: 'flex-start'}}>
+            <button onClick={() => {
+              this.onClickRotate();
+            }}>Rotate
+            </button>
+         </div>
+         <div style={{ maxWidth: '75%', marginLeft: '50px' }}>
+           <canvas
+             style={{ borderWidth: '2px', borderStyle: 'solid', borderColor: 'blue'}}
+             ref={(c) => this.ctx = c.getContext('2d') }
+             width={CANVAS.X}
+             height={CANVAS.Y}
+           >
+         </canvas>
+         </div>
+       </div>
+     </div>
+    );
+  }
+  // CANVAS FUNCTIONS
+  draw() {
+    // initial draw
+    this.ctx.beginPath();
+    this.ctx.rect(PNTS.X, PNTS.Y, PNTS.LENGTH, PNTS.WIDTH);
+    this.ctx.stroke();
+    this.ctx.closePath();
+  }
+
+  rotateRect() {
+    this.ctx.beginPath();
+    this.ctx.save();
+    // move origin
+    this.ctx.translate(this.state.pnts.X, this.state.pnts.Y);
+    // move to center of object
+    this.ctx.translate(this.state.pnts.HALF_LENGTH, this.state.pnts.HALF_WIDTH);
+    this.ctx.rotate(this.state.r);
+    // draw image up/left, half-size of object to keep center
+    this.ctx.rect(-(this.state.pnts.HALF_LENGTH), -(this.state.pnts.HALF_WIDTH), this.state.pnts.LENGTH, this.state.pnts.WIDTH);
+    this.ctx.stroke();
+    this.ctx.restore();
+    this.ctx.closePath();
+  }
+
+  onClickRotate() {
+    this.ctx.clearRect(0, 0, CANVAS.X, CANVAS.Y);
+    this.setState({
+      r: this.state.r + 0.1
+    });
+    this.rotateRect(newR);
+  }
+}
+
 class HandsApp extends Component {
   constructor(props) {
     super(props);
@@ -111,9 +203,12 @@ class HandsApp extends Component {
         { this.state.leap.handsLength > 0
           ? this.state.leap.frame.hands.map(h => {
             return (
-              <ul>
-                <li key={h.id}>Hand {h.id}</li>
-              </ul>
+              <div>
+                <ul>
+                  <li key={h.id}>Hand {h.id}</li>
+                </ul>
+                <Hand key={h.id}/>
+              </div>
             );
           })
           : <h2></h2> }
