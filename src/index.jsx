@@ -198,7 +198,7 @@ class HandsApp extends Component {
           ? <h2>{this.state.leap.handsLength}</h2>
           : <h2></h2> }
           {/* Display for Hands */}
-          <ul>
+          <ul style={{ listStyle: 'none' }}>
             { this.state.leap.handsLength > 0
               ? this.state.leap.hands.map((h) => {
                 return (
