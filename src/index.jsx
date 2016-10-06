@@ -85,12 +85,16 @@ class Hand extends Component {
     super(props);
 
     this.state = {
-      pnts: PNTS
+      pnts: PNTS,
+      angle: {
+        r: 0
+      }
     };
 
     this.onClickRotate = this.onClickRotate.bind(this);
     this.draw = this.draw.bind(this);
     this.rotateRect = this.rotateRect.bind(this);
+    this.drawRectAngle = this.drawRectAngle.bind(this);
   }
 
   componentDidMount() {
@@ -100,7 +104,7 @@ class Hand extends Component {
 
   render() {
     return (
-      <li>
+      <li style={{ display: 'inline-block' }}>
        <div style={{ display: 'flex', alignItems: 'center'}}>
           <div style={{ maxWidth: '25%', alignSelf: 'flex-start'}}>
             <button onClick={() => {
@@ -131,23 +135,35 @@ class Hand extends Component {
   }
 
   rotateRect() {
-    this.ctx.beginPath();
     this.ctx.save();
     // move origin
     this.ctx.translate(this.state.pnts.X, this.state.pnts.Y);
     // move to center of object
     this.ctx.translate(this.state.pnts.HALF_LENGTH, this.state.pnts.HALF_WIDTH);
-    this.ctx.rotate(0.1);
+    const r = this.state.angle.r + 0.1;
+    this.setState({
+      angle: {
+        r: this.state.angle.r + 0.1
+      }
+    });
+    this.ctx.rotate(r);
+  }
+
+  drawRectAngle() {
     // draw image up/left, half-size of object to keep center
     this.ctx.rect(-(this.state.pnts.HALF_LENGTH), -(this.state.pnts.HALF_WIDTH), this.state.pnts.LENGTH, this.state.pnts.WIDTH);
     this.ctx.stroke();
-    this.ctx.restore();
-    this.ctx.closePath();
   }
 
   onClickRotate() {
     this.ctx.clearRect(0, 0, CANVAS.X, CANVAS.Y);
+    this.ctx.beginPath();
+
     this.rotateRect();
+    this.drawRectAngle();
+
+    this.ctx.restore();
+    this.ctx.closePath();
   }
 }
 
@@ -188,6 +204,10 @@ class HandsApp extends Component {
             this.onStop()
           }
         >Stop App</button>
+        <ul>
+          <li style={{ display: 'inline' }}>Hand 1</li>
+          <li style={{ display: 'inline' }}>Hand 2</li>
+        </ul>
         { this.state.leap.connected
           ? <h2>Connected</h2>
           : <h2>Disconnected</h2> }
@@ -202,7 +222,7 @@ class HandsApp extends Component {
             { this.state.leap.handsLength > 0
               ? this.state.leap.hands.map((h) => {
                 return (
-                  <Hand key={h.id}/>
+                  <Hand key={h.id} />
                 );
               })
               : <h2></h2> }
